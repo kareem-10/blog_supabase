@@ -66,8 +66,14 @@ class DatabaseClientImpl implements DatabaseClient {
     String id,
     Map<String, dynamic> data,
   ) async {
-    // TODO: Implement update
-    throw UnimplementedError('update not implemented yet');
+    final response = await _client
+        .from(table)
+        .update(data)
+        .eq('id', id)
+        .single()
+        .single();
+
+    return response;
   }
 
   @override

@@ -39,10 +39,13 @@ class PostCrudDataSourceImpl implements PostCrudDataSource {
   @override
   Future<PostModel> getPostById(String id) async {
     try {
-      // TODO: Implement getPostById
-      // Use _databaseClient.selectById() with columns: '*, author:profiles!author_id(*)'
-      // Parse the response into a PostModel
-      throw UnimplementedError('getPostById not implemented yet');
+      final response = await _databaseClient.selectById(
+        'posts',
+        id,
+        columns: '*, auther:profiles!author_id(*)',
+      );
+
+      return PostModel.fromJson(response);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -59,11 +62,17 @@ class PostCrudDataSourceImpl implements PostCrudDataSource {
     String? category,
   }) async {
     try {
-      // TODO: Implement updatePost
-      // Build update data map with non-null fields
-      // Use _databaseClient.update() to update the post
-      // Then fetch the updated post with author join using getPostById()
-      throw UnimplementedError('updatePost not implemented yet');
+      final data = {
+        'updated_at': DateTime.now().toIso8601String(),
+        'title': title,
+        'content': content,
+        'image_url': imageUrl,
+        'category': category,
+      }..removeWhere((key, value) => value == null);
+
+      await _databaseClient.update('posts', id, data);
+
+      return await getPostById(id);
     } on ServerException {
       rethrow;
     } catch (e) {

@@ -45,7 +45,8 @@ class _PostsListViewState extends State<PostsListView> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       final state = context.read<PostQueryBloc>().state;
       if (state is PostsLoaded && state.hasMore) {
         context.read<PostQueryBloc>().add(const LoadMorePostsEvent());
@@ -61,7 +62,10 @@ class _PostsListViewState extends State<PostsListView> {
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(hintText: 'Search posts...', border: InputBorder.none),
+                decoration: const InputDecoration(
+                  hintText: 'Search posts...',
+                  border: InputBorder.none,
+                ),
                 onChanged: (query) {
                   context.read<PostQueryBloc>().add(SearchPostsEvent(query));
                 },
@@ -92,12 +96,18 @@ class _PostsListViewState extends State<PostsListView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                   const SizedBox(height: 16),
                   Text(state.message, textAlign: TextAlign.center),
                   const SizedBox(height: 16),
                   FilledButton(
-                    onPressed: () => context.read<PostQueryBloc>().add(const GetPostsEvent()),
+                    onPressed: () => context.read<PostQueryBloc>().add(
+                      const GetPostsEvent(),
+                    ),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -110,9 +120,18 @@ class _PostsListViewState extends State<PostsListView> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.article_outlined, size: 80, color: Colors.grey[400]),
+                    Icon(
+                      Icons.article_outlined,
+                      size: 80,
+                      color: Colors.grey[400],
+                    ),
                     const SizedBox(height: 16),
-                    Text('No posts yet', style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.grey)),
+                    Text(
+                      'No posts yet',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleLarge?.copyWith(color: Colors.grey),
+                    ),
                     const SizedBox(height: 8),
                     const Text('Be the first to create a post!'),
                   ],
@@ -129,7 +148,12 @@ class _PostsListViewState extends State<PostsListView> {
                 itemCount: state.posts.length + (state.hasMore ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == state.posts.length) {
-                    return const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()));
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
                   }
                   return _PostCard(post: state.posts[index]);
                 },
@@ -157,14 +181,17 @@ class _PostCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
-        onTap: () => Navigator.of(context).pushNamed('/post-detail', arguments: post.id),
+        onTap: () =>
+            Navigator.of(context).pushNamed('/post-detail', arguments: post.id),
         borderRadius: BorderRadius.circular(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (post.imageUrl != null)
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 child: Image.network(
                   post.imageUrl!,
                   height: 200,
@@ -172,8 +199,15 @@ class _PostCard extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     height: 200,
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: const Icon(Icons.image, size: 64, color: Colors.grey),
+                    width: double.infinity,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
+                    child: const Icon(
+                      Icons.image,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
@@ -186,37 +220,64 @@ class _PostCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Chip(
-                        label: Text(post.category!, style: const TextStyle(fontSize: 12)),
+                        label: Text(
+                          post.category!,
+                          style: const TextStyle(fontSize: 12),
+                        ),
                         padding: EdgeInsets.zero,
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
-                  Text(post.title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    post.title,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     post.content,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundImage: post.author?.avatarUrl != null ? NetworkImage(post.author!.avatarUrl!) : null,
-                        child: post.author?.avatarUrl == null ? const Icon(Icons.person, size: 16) : null,
+                        backgroundImage: post.author?.avatarUrl != null
+                            ? NetworkImage(post.author!.avatarUrl!)
+                            : null,
+                        child: post.author?.avatarUrl == null
+                            ? const Icon(Icons.person, size: 16)
+                            : null,
                       ),
                       const SizedBox(width: 8),
-                      Text(post.author?.name ?? 'Unknown', style: Theme.of(context).textTheme.bodySmall),
+                      Text(
+                        post.author?.name ?? 'Unknown',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                       const Spacer(),
                       Icon(Icons.visibility, size: 16, color: Colors.grey[500]),
                       const SizedBox(width: 4),
-                      Text('${post.viewCount}', style: Theme.of(context).textTheme.bodySmall),
+                      Text(
+                        '${post.viewCount}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                       const SizedBox(width: 12),
-                      Icon(Icons.access_time, size: 16, color: Colors.grey[500]),
+                      Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: Colors.grey[500],
+                      ),
                       const SizedBox(width: 4),
-                      Text(DateFormat.yMMMd().format(post.createdAt), style: Theme.of(context).textTheme.bodySmall),
+                      Text(
+                        DateFormat.yMMMd().format(post.createdAt),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ],
                   ),
                 ],
