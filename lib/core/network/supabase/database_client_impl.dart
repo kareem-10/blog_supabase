@@ -88,13 +88,12 @@ class DatabaseClientImpl implements DatabaseClient {
     required String query,
     String columns = '*',
   }) async {
-    // TODO: Implement search
-    throw UnimplementedError('search not implemented yet');
-  }
+    final response = await _client
+        .from(table)
+        .select(columns)
+        .ilike(column, '%$query%')
+        .order('created_at', ascending: false);
 
-  @override
-  Future<void> rpc(String functionName, {Map<String, dynamic>? params}) async {
-    // TODO: Implement rpc
-    throw UnimplementedError('rpc not implemented yet');
+    return List<Map<String, dynamic>>.from(response);
   }
 }
