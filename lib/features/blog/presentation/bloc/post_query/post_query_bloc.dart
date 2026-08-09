@@ -9,8 +9,10 @@ class PostQueryBloc extends Bloc<PostQueryEvent, PostQueryState> {
 
   static const int _pageSize = 10;
   List<PostEntity> _allPosts = [];
+  String? _currentCategory;
 
-  PostQueryBloc({required this.postQueryRepository}) : super(PostQueryInitial()) {
+  PostQueryBloc({required this.postQueryRepository})
+    : super(PostQueryInitial()) {
     on<GetPostsEvent>(_onGetPosts);
     on<LoadMorePostsEvent>(_onLoadMorePosts);
     on<GetMyPostsEvent>(_onGetMyPosts);
@@ -18,42 +20,60 @@ class PostQueryBloc extends Bloc<PostQueryEvent, PostQueryState> {
     on<RefreshPostsEvent>(_onRefreshPosts);
   }
 
-  Future<void> _onGetPosts(GetPostsEvent event, Emitter<PostQueryState> emit) async {
+  Future<void> _onGetPosts(
+    GetPostsEvent event,
+    Emitter<PostQueryState> emit,
+  ) async {
     emit(PostQueryLoading());
     _allPosts = [];
-    final result = await postQueryRepository.getPosts(rangeFrom: 0, rangeTo: _pageSize - 1);
-    result.fold(
-      (failure) => emit(PostQueryError(failure.message)),
-      (posts) {
-        _allPosts = posts;
-        emit(PostsLoaded(posts: _allPosts, hasMore: posts.length >= _pageSize));
-      },
+    _currentCategory = event.category;
+    final result = await postQueryRepository.getPosts(
+      rangeFrom: 0,
+      rangeTo: _pageSize - 1,
+      category: _currentCategory,
     );
+    result.fold((failure) => emit(PostQueryError(failure.message)), (posts) {
+      _allPosts = posts;
+      emit(PostsLoaded(posts: _allPosts, hasMore: posts.length >= _pageSize));
+    });
   }
 
-  Future<void> _onLoadMorePosts(LoadMorePostsEvent event, Emitter<PostQueryState> emit) async {
+  Future<void> _onLoadMorePosts(
+    LoadMorePostsEvent event,
+    Emitter<PostQueryState> emit,
+  ) async {
     final rangeFrom = _allPosts.length;
     final rangeTo = rangeFrom + _pageSize - 1;
-    final result = await postQueryRepository.getPosts(rangeFrom: rangeFrom, rangeTo: rangeTo);
-    result.fold(
-      (failure) => emit(PostQueryError(failure.message)),
-      (posts) {
-        _allPosts = [..._allPosts, ...posts];
-        emit(PostsLoaded(posts: _allPosts, hasMore: posts.length >= _pageSize));
-      },
+    final result = await postQueryRepository.getPosts(
+      rangeFrom: rangeFrom,
+      rangeTo: rangeTo,
+      category: _currentCategory,
     );
+    result.fold((failure) => emit(PostQueryError(failure.message)), (posts) {
+      _allPosts = [..._allPosts, ...posts];
+      emit(PostsLoaded(posts: _allPosts, hasMore: posts.length >= _pageSize));
+    });
   }
 
-  Future<void> _onGetMyPosts(GetMyPostsEvent event, Emitter<PostQueryState> emit) async {
+  Future<void> _onGetMyPosts(
+    GetMyPostsEvent event,
+    Emitter<PostQueryState> emit,
+  ) async {
     emit(PostQueryLoading());
-    final result = await postQueryRepository.getMyPosts(userId: event.userId, category: event.category);
+    final result = await postQueryRepository.getMyPosts(
+      userId: event.userId,
+      category: event.category,
+    );
     result.fold(
       (failure) => emit(PostQueryError(failure.message)),
       (posts) => emit(PostsLoaded(posts: posts, hasMore: false)),
     );
   }
 
-  Future<void> _onSearchPosts(SearchPostsEvent event, Emitter<PostQueryState> emit) async {
+  Future<void> _onSearchPosts(
+    SearchPostsEvent event,
+    Emitter<PostQueryState> emit,
+  ) async {
     if (event.query.isEmpty) {
       add(const GetPostsEvent());
       return;
@@ -66,15 +86,19 @@ class PostQueryBloc extends Bloc<PostQueryEvent, PostQueryState> {
     );
   }
 
-  Future<void> _onRefreshPosts(RefreshPostsEvent event, Emitter<PostQueryState> emit) async {
+  Future<void> _onRefreshPosts(
+    RefreshPostsEvent event,
+    Emitter<PostQueryState> emit,
+  ) async {
     _allPosts = [];
-    final result = await postQueryRepository.getPosts(rangeFrom: 0, rangeTo: _pageSize - 1);
-    result.fold(
-      (failure) => emit(PostQueryError(failure.message)),
-      (posts) {
-        _allPosts = posts;
-        emit(PostsLoaded(posts: _allPosts, hasMore: posts.length >= _pageSize));
-      },
+    final result = await postQueryRepository.getPosts(
+      rangeFrom: 0,
+      rangeTo: _pageSize - 1,
+      category: _currentCategory,
     );
+    result.fold((failure) => emit(PostQueryError(failure.message)), (posts) {
+      _allPosts = posts;
+      emit(PostsLoaded(posts: _allPosts, hasMore: posts.length >= _pageSize));
+    });
   }
 }

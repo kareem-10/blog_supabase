@@ -1,3 +1,4 @@
+import 'package:blog_app/core/constants/post_categories.dart';
 import 'package:blog_app/core/di/injection_container.dart';
 import 'package:blog_app/features/auth/presentation/bloc/session/session_bloc.dart';
 import 'package:blog_app/features/auth/presentation/bloc/session/session_state.dart';
@@ -35,8 +36,6 @@ class _CreatePostViewState extends State<CreatePostView> {
   String? _selectedCategory;
   String? _imagePath;
 
-  final _categories = ['Technology', 'Lifestyle', 'Travel', 'Food', 'Health', 'Education', 'Other'];
-
   @override
   void dispose() {
     _titleController.dispose();
@@ -55,7 +54,11 @@ class _CreatePostViewState extends State<CreatePostView> {
               return TextButton(
                 onPressed: state is PostCrudLoading ? null : _submitPost,
                 child: state is PostCrudLoading
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
                     : const Text('Publish'),
               );
             },
@@ -65,10 +68,20 @@ class _CreatePostViewState extends State<CreatePostView> {
       body: BlocListener<PostCrudBloc, PostCrudState>(
         listener: (context, state) {
           if (state is PostCreated) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Post created!'), backgroundColor: Colors.green));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Post created!'),
+                backgroundColor: Colors.green,
+              ),
+            );
             Navigator.of(context).pop(true);
           } else if (state is PostCrudError) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message), backgroundColor: Colors.red));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
           }
         },
         child: SingleChildScrollView(
@@ -83,19 +96,31 @@ class _CreatePostViewState extends State<CreatePostView> {
                   child: Container(
                     height: 200,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(16),
                       image: _imagePath != null
-                          ? DecorationImage(image: FileImage(File(_imagePath!)), fit: BoxFit.cover)
+                          ? DecorationImage(
+                              image: FileImage(File(_imagePath!)),
+                              fit: BoxFit.cover,
+                            )
                           : null,
                     ),
                     child: _imagePath == null
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_photo_alternate_outlined, size: 48, color: Colors.grey[500]),
+                              Icon(
+                                Icons.add_photo_alternate_outlined,
+                                size: 48,
+                                color: Colors.grey[500],
+                              ),
                               const SizedBox(height: 8),
-                              Text('Add Cover Image', style: TextStyle(color: Colors.grey[500])),
+                              Text(
+                                'Add Cover Image',
+                                style: TextStyle(color: Colors.grey[500]),
+                              ),
                             ],
                           )
                         : null,
@@ -104,16 +129,29 @@ class _CreatePostViewState extends State<CreatePostView> {
                 const SizedBox(height: 24),
                 TextFormField(
                   controller: _titleController,
-                  decoration: const InputDecoration(labelText: 'Title', hintText: 'Enter post title'),
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    hintText: 'Enter post title',
+                  ),
                   style: Theme.of(context).textTheme.titleLarge,
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Title is required' : null,
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? 'Title is required'
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedCategory,
                   decoration: const InputDecoration(labelText: 'Category'),
-                  items: _categories.map((c) => DropdownMenuItem(value: c.toLowerCase(), child: Text(c))).toList(),
-                  onChanged: (value) => setState(() => _selectedCategory = value),
+                  items: kPostCategories
+                      .map(
+                        (c) => DropdownMenuItem(
+                          value: c.value,
+                          child: Text(c.label),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) =>
+                      setState(() => _selectedCategory = value),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -124,7 +162,9 @@ class _CreatePostViewState extends State<CreatePostView> {
                     alignLabelWithHint: true,
                   ),
                   maxLines: 15,
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Content is required' : null,
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? 'Content is required'
+                      : null,
                 ),
               ],
             ),
@@ -147,12 +187,14 @@ class _CreatePostViewState extends State<CreatePostView> {
     final sessionState = context.read<SessionBloc>().state;
     if (sessionState is! Authenticated) return;
 
-    context.read<PostCrudBloc>().add(CreatePostEvent(
-      title: _titleController.text.trim(),
-      content: _contentController.text.trim(),
-      authorId: sessionState.user.id,
-      imagePath: _imagePath,
-      category: _selectedCategory,
-    ));
+    context.read<PostCrudBloc>().add(
+      CreatePostEvent(
+        title: _titleController.text.trim(),
+        content: _contentController.text.trim(),
+        authorId: sessionState.user.id,
+        imagePath: _imagePath,
+        category: _selectedCategory,
+      ),
+    );
   }
 }
