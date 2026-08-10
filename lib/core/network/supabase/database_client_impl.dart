@@ -70,7 +70,7 @@ class DatabaseClientImpl implements DatabaseClient {
         .from(table)
         .update(data)
         .eq('id', id)
-        .single()
+        .select()
         .single();
 
     return response;
