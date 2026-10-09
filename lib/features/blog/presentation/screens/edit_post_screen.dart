@@ -208,6 +208,7 @@ class _EditPostViewState extends State<EditPostView> {
         content: _contentController.text.trim(),
         imagePath: _imagePath,
         category: _selectedCategory,
+        authorId: widget.post.authorId,
       ),
     );
   }
